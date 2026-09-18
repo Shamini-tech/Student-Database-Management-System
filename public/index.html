@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Database Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <h1>🎓 Student Database Management System</h1>
+  </header>
+
+  <div class="main-container">
+    <form id="studentForm" class="dashboard-grid">
+      <!-- Hidden input to store MongoDB ID during edits -->
+      <input type="hidden" id="recordMongoId">
+
+      <!-- Column 1: Personal & Guardian Info -->
+      <div class="column">
+        <fieldset class="panel">
+          <legend>Student Information</legend>
+          <div class="field"><label>Student ID</label><input type="text" id="studentID" required placeholder="24524"></div>
+          <div class="field"><label>Firstname</label><input type="text" id="firstname" required placeholder="Deborah"></div>
+          <div class="field"><label>Surname</label><input type="text" id="surname" required placeholder="Oamen"></div>
+          <div class="field"><label>Address</label><input type="text" id="address" placeholder="11 Godstown Ave"></div>
+          <div class="field">
+            <label>Gender</label>
+            <select id="gender">
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field"><label>DOB</label><input type="text" id="dob" placeholder="11/10/2003"></div>
+          <div class="field"><label>Mobile</label><input type="text" id="mobile" placeholder="09874801451"></div>
+          <div class="field"><label>Email</label><input type="email" id="email" placeholder="deborah@gmail.com"></div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend>Guidance / Guardian Info</legend>
+          <div class="field">
+            <label>Guidance</label>
+            <select id="guardianRelation">
+              <option value="Father">Father</option>
+              <option value="Mother">Mother</option>
+              <option value="Guardian">Guardian</option>
+            </select>
+          </div>
+          <div class="field"><label>Firstname</label><input type="text" id="guardianFirstname" placeholder="Christ"></div>
+          <div class="field"><label>Surname</label><input type="text" id="guardianSurname" placeholder="Oamen"></div>
+          <div class="field"><label>Address</label><input type="text" id="guardianAddress" placeholder="11 Godstown Ave"></div>
+          <div class="field"><label>Mobile</label><input type="text" id="guardianMobile" placeholder="05787480145"></div>
+          <div class="field"><label>Email</label><input type="email" id="guardianEmail" placeholder="christ@gmail.com"></div>
+        </fieldset>
+      </div>
+
+      <!-- Column 2: Academic Details & Status -->
+      <div class="column">
+        <fieldset class="panel">
+          <legend>Academic Course Details</legend>
+          <div class="field"><label>Course</label><input type="text" id="course" placeholder="BSc Information System"></div>
+          <div class="field"><label>Course Code</label><input type="text" id="courseCode" placeholder="BScC709"></div>
+          <div class="field"><label>Faculty</label><input type="text" id="faculty" placeholder="School of Computer Animation"></div>
+          <div class="field"><label>Dean of Faculty</label><input type="text" id="deanOfFaculty" placeholder="Prof. Danny Moorehouse"></div>
+          <div class="field"><label>Program Leader</label><input type="text" id="programLeader" placeholder="Prof. Felix Stonehead"></div>
+          <div class="field"><label>Course Tutor</label><input type="text" id="courseTutor" placeholder="Dr. Harry Lighthouse"></div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend>Student Status</legend>
+          <div class="status-grid">
+            <div class="field"><label>Home Student</label><select id="statusHome"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+            <div class="field"><label>Oversea Student</label><select id="statusOversea"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+            <div class="field"><label>Accommodation</label><select id="statusAccom"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+            <div class="field"><label>Exchange</label><select id="statusExchange"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+            <div class="field"><label>Scholarship</label><select id="statusScholarship"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+          </div>
+        </fieldset>
+
+        <!-- Form Action Control Buttons -->
+        <div class="button-bar">
+          <button type="submit" id="btnSave" class="btn btn-save">AddNew / Save</button>
+          <button type="button" id="btnReset" class="btn btn-reset">Reset</button>
+          <button type="button" id="btnCalculate" class="btn btn-calc">Result</button>
+        </div>
+      </div>
+
+      <!-- Column 3: 8 Subject Inputs & Calculation Displays -->
+      <div class="column">
+        <fieldset class="panel">
+          <legend>Subject Marks (Out of 100)</legend>
+          <div class="subject-row"><span>1. Visual C++</span><input type="number" class="subject-score" data-name="Visual C++" value="98" min="0" max="100"></div>
+          <div class="subject-row"><span>2. Spreadsheet</span><input type="number" class="subject-score" data-name="Spreadsheet" value="94" min="0" max="100"></div>
+          <div class="subject-row"><span>3. System Analysis</span><input type="number" class="subject-score" data-name="System Analysis" value="87" min="0" max="100"></div>
+          <div class="subject-row"><span>4. Artificial Intel.</span><input type="number" class="subject-score" data-name="Artificial Intelligence" value="78" min="0" max="100"></div>
+          <div class="subject-row"><span>5. JavaScript</span><input type="number" class="subject-score" data-name="JavaScript" value="90" min="0" max="100"></div>
+          <div class="subject-row"><span>6. Object Oriented</span><input type="number" class="subject-score" data-name="Object Oriented" value="87" min="0" max="100"></div>
+          <div class="subject-row"><span>7. Cyber Security</span><input type="number" class="subject-score" data-name="Cyber Security" value="93" min="0" max="100"></div>
+          <div class="subject-row"><span>8. Computer Graphics</span><input type="number" class="subject-score" data-name="Computer Graphics" value="87" min="0" max="100"></div>
+          
+          <hr class="divider">
+          
+          <div class="calc-row"><label>Total Score</label><input type="text" id="displayTotal" readonly placeholder="0"></div>
+          <div class="calc-row"><label>Average %</label><input type="text" id="displayAvg" readonly placeholder="0%"></div>
+          <div class="calc-row"><label>Ranking</label><input type="text" id="displayRanking" class="rank-badge" readonly placeholder="Pending"></div>
+        </fieldset>
+      </div>
+    </form>
+
+    <!-- Bottom Records View -->
+    <section class="table-container">
+      <h2>Database Records (MongoDB)</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Course</th>
+            <th>Total Score</th>
+            <th>Average</th>
+            <th>Ranking</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="recordsTableBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

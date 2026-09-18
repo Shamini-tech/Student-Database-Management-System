@@ -1,0 +1,194 @@
+/* Reset default margins, paddings, and set uniform box-sizing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Base page background and default font color */
+body {
+  background-color: #eef2f5;
+  color: #333;
+}
+
+/* Header bar styling */
+.app-header {
+  background: #0f4c81;
+  color: white;
+  padding: 12px 20px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Central container holding the form and database records table */
+.main-container {
+  max-width: 1450px;
+  margin: 15px auto;
+  padding: 0 15px;
+}
+
+/* Grid layout splitting the dashboard into 3 columns */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Fieldset section card panels */
+.panel {
+  background: #ffffff;
+  border: 1px solid #c3d1df;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Panel section header labels */
+.panel legend {
+  font-weight: bold;
+  color: #0f4c81;
+  padding: 0 6px;
+  font-size: 0.95rem;
+}
+
+/* Input rows aligning labels and fields side-by-side */
+.field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #222;
+  width: 42%;
+}
+
+.field input, .field select {
+  width: 56%;
+  padding: 5px 8px;
+  border: 1px solid #b0bec5;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* Focus styles for text inputs and dropdowns */
+.field input:focus, .field select:focus {
+  border-color: #0f4c81;
+  outline: none;
+}
+
+/* Subject mark rows */
+.subject-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.subject-row input {
+  width: 70px;
+  padding: 4px;
+  text-align: right;
+  border: 1px solid #b0bec5;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Horizontal line separator above calculations */
+.divider {
+  margin: 12px 0;
+  border: 0;
+  border-top: 1px solid #cfd8dc;
+}
+
+/* Dynamic total, average, and degree rank rows */
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.calc-row label {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.calc-row input {
+  width: 120px;
+  padding: 5px;
+  text-align: right;
+  font-weight: bold;
+  border: 1px solid #b0bec5;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Highlight badge for degree classification ranking */
+.rank-badge {
+  color: #0f4c81;
+  background: #e3f2fd !important;
+}
+
+/* Form action control buttons wrapper */
+.button-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* General button styling */
+.btn {
+  flex: 1;
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn:hover { 
+  opacity: 0.9; 
+}
+
+/* Color variations for buttons */
+.btn-save { background: #0f4c81; color: white; }
+.btn-reset { background: #6c757d; color: white; }
+.btn-calc { background: #28a745; color: white; }
+.btn-danger { background: #dc3545; color: white; padding: 4px 8px; border-radius: 3px; cursor: pointer; border: none; }
+.btn-edit { background: #ffc107; color: #222; padding: 4px 8px; border-radius: 3px; cursor: pointer; border: none; margin-right: 4px; }
+
+/* MongoDB records table wrapper */
+.table-container {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #c3d1df;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #dee2e6;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.data-table th {
+  background: #f1f5f9;
+  color: #0f4c81;
+}
