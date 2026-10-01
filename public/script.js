@@ -1,200 +1,202 @@
-const API_URL = '/api/students';
+// ==========================================
+// 1. AUTHENTICATION & API HELPERS
+// ==========================================
 
-// Initialize events when DOM is loaded
+// Redirect to login if token is missing
+const token = localStorage.getItem('token');
+if (!token) {
+  window.location.href = '/login.html';
+}
+
+// Helper function to handle fetch calls with JWT authorization header
+async function fetchWithAuth(url, options = {}) {
+  options.headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+    'Authorization': `Bearer ${localStorage.getItem('token')}`
+  };
+
+  const response = await fetch(url, options);
+
+  // If token is invalid or expired, clear storage and redirect to login
+  if (response.status === 401 || response.status === 403) {
+    localStorage.removeItem('token');
+    window.location.href = '/login.html';
+  }
+
+  return response;
+}
+
+// Logout helper
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/login.html';
+}
+
+// ==========================================
+// 2. DOM LOAD & INITIALIZATION
+// ==========================================
+
 document.addEventListener('DOMContentLoaded', () => {
   fetchStudents();
 
-  // Attach dynamic listener to all score inputs for instant calculations
-  document.querySelectorAll('.subject-score').forEach(input => {
-    input.addEventListener('input', computeLiveResults);
+  // Attach event listeners to mark inputs to auto-calculate scores
+  const markInputs = document.querySelectorAll('.mark-input');
+  markInputs.forEach(input => {
+    input.addEventListener('input', calculateResults);
   });
 
-  document.getElementById('btnCalculate').addEventListener('click', computeLiveResults);
-  document.getElementById('studentForm').addEventListener('submit', saveStudent);
-  document.getElementById('btnReset').addEventListener('click', resetForm);
-
-  // Run initial calculation
-  computeLiveResults();
+  // Attach form submission listener
+  const studentForm = document.getElementById('student-form');
+  if (studentForm) {
+    studentForm.addEventListener('submit', handleFormSubmit);
+  }
 });
 
-// Compute dynamic score results on the client side
-function computeLiveResults() {
-  const subjectInputs = document.querySelectorAll('.subject-score');
+// ==========================================
+// 3. AUTO-CALCULATE SCORES & GRADES
+// ==========================================
+
+function calculateResults() {
+  const markInputs = document.querySelectorAll('.mark-input');
   let total = 0;
   let count = 0;
 
-  subjectInputs.forEach(i => {
-    const val = parseFloat(i.value) || 0;
-    total += val;
-    count++;
+  markInputs.forEach(input => {
+    const val = parseFloat(input.value);
+    if (!isNaN(val)) {
+      total += val;
+      count++;
+    }
   });
 
-  const avg = count > 0 ? (total / count) : 0;
-  let rank = 'Fail';
+  const average = count > 0 ? (total / count).toFixed(2) : 0;
 
-  if (avg >= 70) rank = '1st Class';
-  else if (avg >= 60) rank = '2:1 Upper';
-  else if (avg >= 50) rank = '2:2 Lower';
-  else if (avg >= 40) rank = 'Pass';
+  // Set total and average in DOM
+  const totalScoreElem = document.getElementById('totalScore');
+  const averageElem = document.getElementById('average');
+  const rankingElem = document.getElementById('ranking');
 
-  document.getElementById('displayTotal').value = total;
-  document.getElementById('displayAvg').value = avg.toFixed(2) + '%';
-  document.getElementById('displayRanking').value = rank;
+  if (totalScoreElem) totalScoreElem.value = total;
+  if (averageElem) averageElem.value = average;
 
-  return { total, avg: parseFloat(avg.toFixed(2)), rank };
-}
-
-// Fetch and render existing database records in table rows
-async function fetchStudents() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    const tbody = document.getElementById('recordsTableBody');
-    tbody.innerHTML = '';
-
-    if (!Array.isArray(data)) return;
-
-    data.forEach(s => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${s.studentID}</td>
-          <td>${s.firstname} ${s.surname}</td>
-          <td>${s.course || 'N/A'}</td>
-          <td>${s.totalScore}</td>
-          <td>${s.average}%</td>
-          <td><strong>${s.ranking}</strong></td>
-          <td>
-            <button class="btn-edit" onclick="editStudent('${s._id}')">Edit</button>
-            <button class="btn-danger" onclick="deleteStudent('${s._id}')">Delete</button>
-          </td>
-        </tr>
-      `;
-    });
-  } catch (err) {
-    console.error('Error fetching student list:', err);
+  // Calculate Ranking/Class based on Average
+  if (rankingElem) {
+    if (average >= 70) rankingElem.value = '1st Class';
+    else if (average >= 60) rankingElem.value = '2nd Class Upper';
+    else if (average >= 50) rankingElem.value = '2nd Class Lower';
+    else if (average >= 40) rankingElem.value = 'Pass';
+    else rankingElem.value = 'Fail';
   }
 }
 
-// Save or Update Student Record
-async function saveStudent(e) {
+// ==========================================
+// 4. API CALLS (CRUD OPERATIONS)
+// ==========================================
+
+// Fetch all students
+async function fetchStudents() {
+  try {
+    const res = await fetchWithAuth('/api/students');
+    if (!res.ok) throw new Error('Failed to fetch students');
+    
+    const students = await res.json();
+    renderStudentList(students);
+  } catch (err) {
+    console.error('Error fetching students:', err);
+  }
+}
+
+// Render students list into UI table/list
+function renderStudentList(students) {
+  const listContainer = document.getElementById('student-list');
+  if (!listContainer) return;
+
+  listContainer.innerHTML = '';
+
+  students.forEach(student => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${student.studentID || ''}</td>
+      <td>${student.firstname || ''} ${student.surname || ''}</td>
+      <td>${student.course || ''}</td>
+      <td>${student.average || 0}</td>
+      <td>${student.ranking || ''}</td>
+      <td>
+        <button onclick="editStudent('${student._id}')">Edit</button>
+        <button onclick="deleteStudent('${student._id}')">Delete</button>
+      </td>
+    `;
+    listContainer.appendChild(row);
+  });
+}
+
+// Submit / Add New Student
+async function handleFormSubmit(e) {
   e.preventDefault();
 
-  const mongoId = document.getElementById('recordMongoId').value;
-  const computed = computeLiveResults();
-
-  const subjectInputs = document.querySelectorAll('.subject-score');
-  const subjects = Array.from(subjectInputs).map(i => ({
-    name: i.dataset.name,
-    score: parseFloat(i.value) || 0
-  }));
-
-  const payload = {
-    studentID: document.getElementById('studentID').value,
-    firstname: document.getElementById('firstname').value,
-    surname: document.getElementById('surname').value,
-    address: document.getElementById('address').value,
-    gender: document.getElementById('gender').value,
-    dob: document.getElementById('dob').value,
-    mobile: document.getElementById('mobile').value,
-    email: document.getElementById('email').value,
-    guidance: {
-      relation: document.getElementById('guardianRelation').value,
-      firstname: document.getElementById('guardianFirstname').value,
-      surname: document.getElementById('guardianSurname').value,
-      address: document.getElementById('guardianAddress').value,
-      mobile: document.getElementById('guardianMobile').value,
-      email: document.getElementById('guardianEmail').value
-    },
-    course: document.getElementById('course').value,
-    courseCode: document.getElementById('courseCode').value,
-    faculty: document.getElementById('faculty').value,
-    deanOfFaculty: document.getElementById('deanOfFaculty').value,
-    programLeader: document.getElementById('programLeader').value,
-    courseTutor: document.getElementById('courseTutor').value,
-    subjects: subjects,
-    totalScore: computed.total,
-    average: computed.avg,
-    ranking: computed.rank
+  const formData = {
+    studentID: document.getElementById('studentID')?.value,
+    firstname: document.getElementById('firstname')?.value,
+    surname: document.getElementById('surname')?.value,
+    address: document.getElementById('address')?.value,
+    gender: document.getElementById('gender')?.value,
+    dob: document.getElementById('dob')?.value,
+    mobile: document.getElementById('mobile')?.value,
+    email: document.getElementById('email')?.value,
+    course: document.getElementById('course')?.value,
+    courseCode: document.getElementById('courseCode')?.value,
+    faculty: document.getElementById('faculty')?.value,
+    deanOfFaculty: document.getElementById('deanOfFaculty')?.value,
+    programLeader: document.getElementById('programLeader')?.value,
+    courseTutor: document.getElementById('courseTutor')?.value,
+    totalScore: parseFloat(document.getElementById('totalScore')?.value) || 0,
+    average: parseFloat(document.getElementById('average')?.value) || 0,
+    ranking: document.getElementById('ranking')?.value
   };
 
-  const method = mongoId ? 'PUT' : 'POST';
-  const url = mongoId ? `${API_URL}/${mongoId}` : API_URL;
-
   try {
-    const response = await fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const res = await fetchWithAuth('/api/students', {
+      method: 'POST',
+      body: JSON.stringify(formData)
     });
 
-    if (response.ok) {
+    if (res.ok) {
+      alert('Student record saved successfully!');
       resetForm();
       fetchStudents();
     } else {
-      const errorData = await response.json();
-      alert('Save Error: ' + (errorData.error || 'Check input details'));
+      const errorData = await res.json();
+      alert(`Error saving record: ${errorData.message || 'Server error'}`);
     }
   } catch (err) {
-    console.error('Network error on save:', err);
+    console.error('Save error:', err);
+    alert('Failed to connect to the server.');
   }
 }
 
-// Fetch record details and populate the form fields for editing
-async function editStudent(id) {
-  const res = await fetch(API_URL);
-  const students = await res.json();
-  const s = students.find(item => item._id === id);
-
-  if (!s) return;
-
-  document.getElementById('recordMongoId').value = s._id;
-  document.getElementById('studentID').value = s.studentID;
-  document.getElementById('firstname').value = s.firstname;
-  document.getElementById('surname').value = s.surname;
-  document.getElementById('address').value = s.address || '';
-  document.getElementById('gender').value = s.gender || 'Female';
-  document.getElementById('dob').value = s.dob || '';
-  document.getElementById('mobile').value = s.mobile || '';
-  document.getElementById('email').value = s.email || '';
-
-  if (s.guidance) {
-    document.getElementById('guardianRelation').value = s.guidance.relation || 'Father';
-    document.getElementById('guardianFirstname').value = s.guidance.firstname || '';
-    document.getElementById('guardianSurname').value = s.guidance.surname || '';
-    document.getElementById('guardianAddress').value = s.guidance.address || '';
-    document.getElementById('guardianMobile').value = s.guidance.mobile || '';
-    document.getElementById('guardianEmail').value = s.guidance.email || '';
-  }
-
-  document.getElementById('course').value = s.course || '';
-  document.getElementById('courseCode').value = s.courseCode || '';
-  document.getElementById('faculty').value = s.faculty || '';
-  document.getElementById('deanOfFaculty').value = s.deanOfFaculty || '';
-  document.getElementById('programLeader').value = s.programLeader || '';
-  document.getElementById('courseTutor').value = s.courseTutor || '';
-
-  if (s.subjects) {
-    const inputs = document.querySelectorAll('.subject-score');
-    inputs.forEach(input => {
-      const found = s.subjects.find(sub => sub.name === input.dataset.name);
-      if (found) input.value = found.score;
-    });
-  }
-
-  computeLiveResults();
-}
-
-// Delete Record
+// Delete Student Record
 async function deleteStudent(id) {
-  if (confirm('Are you sure you want to delete this student record?')) {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    fetchStudents();
+  if (!confirm('Are you sure you want to delete this student?')) return;
+
+  try {
+    const res = await fetchWithAuth(`/api/students/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (res.ok) {
+      alert('Student record deleted successfully.');
+      fetchStudents();
+    } else {
+      alert('Failed to delete student.');
+    }
+  } catch (err) {
+    console.error('Delete error:', err);
   }
 }
 
-// Clear form inputs
+// Reset Form Controls
 function resetForm() {
-  document.getElementById('studentForm').reset();
-  document.getElementById('recordMongoId').value = '';
-  computeLiveResults();
+  const form = document.getElementById('student-form');
+  if (form) form.reset();
 }
