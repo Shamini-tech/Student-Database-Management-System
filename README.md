@@ -1,22 +1,35 @@
-🎓 Student Database Management SystemA full-stack web application designed for managing student records, tracking course enrollment, dynamically computing academic results, and persisting data using Node.js, Express, and MongoDB.🌟 Key Features3-Column Dashboard Layout: Clean, structured responsive user interface for personal, academic, and module score entries.Dynamic Results Calculation: Instant client-side computation for Total Score, Average Percentage, and Degree Classification (1st Class, 2:1 Upper, 2:2 Lower, Pass, Fail).Full CRUD Operations:Create: Register new student records.Read: View real-time database entries in a clean table format.Update: Edit existing student details seamlessly.Delete: Remove student records with prompt confirmations.RESTful API Backend: Express server integrated with Mongoose models for structured schema validation.🛠️ Tech StackFrontend: HTML5, CSS3 (CSS Grid & Flexbox), Modern JavaScript (ES6+ Fetch API)Backend: Node.js, Express.jsDatabase: MongoDB, Mongoose ODMEnvironment Configuration: dotenv, cors📁 Folder StructurePlaintextStudent Database Management System/
-│
-├── models/
-│   └── Student.js          # Mongoose schema and database models
-├── routes/
-│   └── studentRoutes.js     # REST API route handlers (GET, POST, PUT, DELETE)
-├── public/
-│   ├── index.html          # Main application user interface
-│   ├── style.css           # Styling and layout management
-│   └── script.js           # Client-side validation, event handlers & API requests
-├── .env                    # Environment variables (DB Connection & Port)
-├── .gitignore              # Ignored files (node_modules, .env)
-├── package.json            # Project dependencies and scripts
-└── server.js               # Entry point for the Express server
-🚀 Getting StartedPrerequisitesEnsure you have the following installed on your local system:Node.js (v14 or higher)MongoDB Community Server running locally on port 27017InstallationClone the repository:Bashgit clone https://github.com/Shamini-tech/Student-Database-Management-System.git
-cd Student-Database-Management-System
-Install dependencies:Bashnpm install
-Configure Environment Variables:Create a .env file in the root directory:Code snippetPORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/studentDB
-Start the server:Bashnode server.js
-Access the application:Open your browser and navigate to:Plaintexthttp://localhost:5000
-📊 API EndpointsMethodEndpointDescriptionGET/api/studentsRetrieve all student recordsPOST/api/studentsCreate a new student recordPUT/api/students/:idUpdate an existing student record by IDDELETE/api/students/:idDelete a student record by ID📄 LicenseThis project is open-source and available under the MIT License.
+# Student Database Management System
+
+A web-based full-stack application designed to manage student records, user authentication, and administrative controls efficiently.
+
+---
+
+## Features
+
+- **User Authentication:** Secure login and registration system with middleware protection.
+- **Student Record Management:** Add, view, update, and delete student records (CRUD operations).
+- **RESTful API Routes:** Clean separation of concerns with modular route handling for authentication and student management.
+- **Responsive Dashboard:** Simple and intuitive front-end interface built with standard HTML/CSS and JavaScript.
+
+---
+
+## Tech Stack
+
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB / Mongoose (or SQL equivalent)
+- **Frontend:** HTML5, CSS3, JavaScript (Fetch API)
+- **Authentication:** Middleware-based session/token validation
+
+---
+
+## Directory Structure
+
+```text
+Student Database Management System/
+├── middleware/         # Custom authentication & request validation middleware
+├── models/             # Database schemas (User.js, Student models)
+├── public/             # Static frontend files (script.js, login.html, etc.)
+├── routes/             # API endpoints (authRoutes.js, studentRoutes.js)
+├── .gitignore          # Files excluded from version control
+├── package.json        # Dependencies and project scripts
+└── server.js           # Main application entry point
